@@ -47,7 +47,7 @@ function setupCookie() {
   fs.writeFileSync(js_path, js_content, 'utf8')
 }
 
-function sendNotificationIfNeed(text, desp) {
+function sendNotificationIfNeed() {
 
   if (!push_key) {
     console.log('执行任务结束!'); return;
@@ -57,12 +57,15 @@ function sendNotificationIfNeed(text, desp) {
     console.log('没有执行结果，任务中断!'); return;
   }
 
-  let title = "京东签到_" + new Date().Format('yyyy.MM.dd');
-  let content = fs.readFileSync(result_path, "utf8")
+  let text = "京东签到_" + new Date().Format('yyyy.MM.dd');
+  let desp = fs.readFileSync(result_path, "utf8")
+
+  // 去除末尾的换行
+  let SCKEY = push_key.replace(/[\r\n]/g,"")
 
   const options ={
-    uri:  `https://sc.ftqq.com/${push_key}.send`,
-    form: { 'text': title, 'desp' : content },
+    uri:  `https://sc.ftqq.com/${SCKEY}.send`,
+    form: { text, desp },
     json: true,
     method: 'POST'
   }
@@ -79,7 +82,6 @@ function sendNotificationIfNeed(text, desp) {
     }
   }).catch((err)=>{
     console.log("通知发送失败，任务中断！")
-    console.log("请确认Server酱SCKEY配置是否正确！")
     fs.writeFileSync(error_path, err, 'utf8')
   })
 }
